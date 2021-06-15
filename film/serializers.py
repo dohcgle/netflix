@@ -3,7 +3,16 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from film.models import Movie, Actor
+from film.models import Movie, Actor, Comment
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+
+
+
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:

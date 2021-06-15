@@ -1,13 +1,52 @@
 from django.db import transaction
+from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.utils import json
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from django.http import JsonResponse
-from .models import Actor, Movie
-from .serializers import ActorSerializer, MovieSerializer
+from .models import Actor, Movie, Comment
+from .serializers import ActorSerializer, MovieSerializer, CommentSerializer
+
+
+class CommentAPIView(APIView):
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(data=serializer.data)
+
+
+
+    def get_object(self, pk):
+        try:
+            return Comment.objects.get(pk=pk)
+        except:
+            raise Http404
+
+    def delete(self, request, pk, format=None):
+        comment = self.get_object(pk)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+    def post(self, request):
+        serializer = CommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
+
+
+class CommentViewSet(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
 
 class MovieViewSet(ModelViewSet):
     queryset = Movie.objects.all()
@@ -38,10 +77,6 @@ class MovieViewSet(ModelViewSet):
         actors = movie.actor.all().values()
         data = list(actors)
         return Response(data=data)
-
-
-
-
 
 
 
