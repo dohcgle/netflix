@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.http import Http404
-from rest_framework import status
+from rest_framework import status,filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,10 +39,6 @@ class CommentAPIView(APIView):
 
 
 
-
-
-
-
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -51,6 +47,9 @@ class CommentViewSet(ModelViewSet):
 class MovieViewSet(ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    ordering_fields = ["imdb"]
+    search_fields = ["name", "genre"]
 
     @action(detail=True, methods=['POST'])
     def add_actor(self, request, *args, **kwargs):
